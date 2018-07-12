@@ -22,6 +22,7 @@ The project structure is as follows.
   * *ManyRooms.building* was used for the third experiment in the paper and generates multiple federate classes.
 * **models**: Contains the models that can be used in the Lighting DSL.
 * **plugin**: Contains the plugin for direct installation in Eclipse.
+* **distribution_script**: Contains the script that was used to execute the benchmarks regarding distributed execution.
 
 ## Installation
 The Lighting plugin can be used by either creating a runtime workspace for the provided project sources or by installing the plugin.

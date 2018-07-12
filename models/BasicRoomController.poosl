@@ -1,0 +1,40 @@
+process class BasicRoomController(OccupiedHoldTime, OccupiedLevel, VacantHoldTime, VacantLevel : Real)
+ports
+messages
+variables
+	occupied : Boolean
+	setpoint : Real
+init
+	Init()()
+methods
+	Init()()
+		occupied := false;
+		setpoint := 0.0;
+		Off()()
+	
+	Off()()
+		setpoint := 0.0;
+		delay 0.01;
+		[occupied] On()()
+	
+	On()()
+		setpoint := OccupiedLevel;
+		delay 0.01;
+		[!occupied]
+		abort 
+			delay OccupiedHoldTime;
+			Vacant()()
+		with [occupied] On()()
+		
+	Vacant()()
+		setpoint := VacantLevel;
+		delay 0.01;
+		abort 
+			delay VacantHoldTime;
+			Off()()
+		with [occupied] On()()
+		
+system
+instances
+	controller : BasicRoomController(OccupiedHoldTime := 300.0, OccupiedLevel := 100.0, VacantHoldTime := 180.0, VacantLevel := 50.0)
+channels

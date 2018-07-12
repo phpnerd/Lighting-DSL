@@ -1,0 +1,114 @@
+grammar nl.ru.sws.dsl.lighting.Building with org.eclipse.xtext.common.Terminals
+
+generate building "http://www.ru.nl/sws/dsl/lighting/Building"
+
+Model:
+	config = Configuration?
+	buildings += Building+
+;
+
+Configuration:
+	'Configuration' '{'
+    '#Actors:' actors = INT
+    'OccupancySensorRanges:' occupancySensorRanges += INT+
+    (hasLogger ?= 'HasLogger')?
+    ('MeasureTime:' measureTime = INT)?
+    (hideSensorRange ?= 'HideSensorRange')?
+    ('Distributions:' distributions+=INT+)?
+    (separateClasses ?= 'SeparateClasses')?
+    (separateActors ?= 'SeparateActors')?
+    ('ModelDir:' modelDir=STRING)?
+	'}'
+;
+
+Building:
+	'Building' name=ID '{'
+		areas += Area+
+		('Scenarios' '{'
+	    scenarios += Scenario+
+    '}')?
+	'}'
+;
+
+Area:
+	Room | Corridor
+;
+
+Room:
+	'Room' (type=RoomType)? name=ID '{'
+		('Draw:' draw = Draw)?
+		('Devices' '{'
+			devices += Device+
+		'}')?
+	'}'
+;
+
+Corridor:
+	'Corridor' name=ID '{'
+		('Draw:' draw = Draw)?
+		'Rooms:' connectedRooms += [Room]+
+		('Devices' '{'
+		  devices += Device+
+		'}')?
+	'}'
+;
+
+Device:
+	Light | Sensor
+;
+
+Light:
+	'Light' (type = LightType)? name=ID ('on' location=Coord)?
+;
+
+Sensor:
+	'Sensor' (type = SensorType)? name=ID ('on' location=Coord)?
+;
+
+Draw:
+	coords += Coord (coords += Coord)+
+;
+
+Coord:
+	'(' x = INT ',' y = INT ')'
+;
+
+Scenario:
+  'Scenario' name = ID 'for' 'Actor' actorId = INT '{'
+    (
+        ('ActorActivity:' actorActivity=ActorActivity)
+      |
+        (interpolate ?= 'Interpolate' interpolateStep = INT)
+    )?
+    startPosition = Coord steps += ScenarioStep+
+  '}'
+;
+
+ScenarioStep:
+  '[' delay = INT ']' position = Coord
+;
+
+ActorActivity:
+  portion=INT '/' total=INT 's' 'from' startFrom=INT 's' 'to' endBefore=INT 's'
+;
+
+enum RoomType:
+    basic = 'Basic'
+  | office = 'Office'
+  | officespace = 'OfficeSpace'
+;
+
+enum LightType:
+    dimmable = 'Dimmable'
+  | onoff = 'OnOff'
+;
+
+enum SensorType:
+    occupancy = 'Occupancy'
+;
+
+enum OccupancySensorType:
+    wideRange = 'WideRange'
+  | medRange = 'MediumRange'
+  | smallRange = 'SmallRange'
+;

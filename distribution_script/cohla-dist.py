@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+#
+# Copyright (c) Thomas Nägele and contributors. All rights reserved.
+# Licensed under the MIT license. See LICENSE file in the project root for details.
+#
+
 import argparse, asyncio
 
 from models import CloudNodeSet, BenchmarkSet

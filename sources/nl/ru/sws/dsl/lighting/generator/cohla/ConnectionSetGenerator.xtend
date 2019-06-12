@@ -11,7 +11,7 @@ import nl.ru.sws.dsl.lighting.building.Corridor
 import nl.ru.sws.dsl.lighting.building.Room
 import nl.ru.sws.dsl.lighting.building.RoomType
 
-class InterfaceGenerator {
+class ConnectionSetGenerator {
 
 static def generate(Building building, int nrOfActors, boolean separateClasses, boolean separateActors) {
   val hasBasicRoom = building.areas.exists[a | a instanceof Room && (a as Room).type == RoomType.BASIC]
@@ -20,9 +20,9 @@ static def generate(Building building, int nrOfActors, boolean separateClasses, 
   val hasCorridor = building.areas.exists[a | a instanceof Corridor]
   return
 '''
-import "FedClasses.hla"
+import "FedClasses.cohla"
 «IF nrOfActors > 0»
-import "Actor.hla"
+import "Actor.cohla"
 «ENDIF»
 
 «IF !separateClasses»«generateBasicInterfaces("", hasBasicRoom, hasOffice, hasOfficeSpace, hasCorridor, nrOfActors > 0)»
@@ -87,65 +87,65 @@ static def generateInterfaces(Area area, int nrOfActors, boolean separateActors)
 
 static def basicRoomControllerToOccupancySensor(String suffix)
 '''
-Interface between BasicRoomController«suffix» and OccupancySensor«suffix» {
-  Connection { BasicRoomController«suffix».occupied <- OccupancySensor«suffix».occupied }
+ConnectionSet between BasicRoomController«suffix» and OccupancySensor«suffix» {
+  { BasicRoomController«suffix».occupied <- OccupancySensor«suffix».occupied }
 }
 '''
 
 static def basicRoomControllerToDimmableLight(String suffix)
 '''
-Interface between BasicRoomController«suffix» and DimmableLight«suffix» {
-  Connection { DimmableLight«suffix».setpoint <- BasicRoomController«suffix».setpoint }
+ConnectionSet between BasicRoomController«suffix» and DimmableLight«suffix» {
+  { DimmableLight«suffix».setpoint <- BasicRoomController«suffix».setpoint }
 }
 '''
 
 static def officeControllerToOccupancySensor(String suffix)
 '''
-Interface between OfficeController«suffix» and OccupancySensor«suffix» {
-  Connection { OfficeController«suffix».occupied <- OccupancySensor«suffix».occupied }
+ConnectionSet between OfficeController«suffix» and OccupancySensor«suffix» {
+  { OfficeController«suffix».occupied <- OccupancySensor«suffix».occupied }
 }
 '''
 
 static def officeControllerToDimmableLight(String suffix)
 '''
-Interface between OfficeController«suffix» and DimmableLight«suffix» {
-  Connection { DimmableLight«suffix».setpoint <- OfficeController«suffix».setpoint }
+ConnectionSet between OfficeController«suffix» and DimmableLight«suffix» {
+  { DimmableLight«suffix».setpoint <- OfficeController«suffix».setpoint }
 }
 '''
 
 static def officeSpaceControllerToOccupancySensor(String suffix)
 '''
-Interface between OfficeSpaceController«suffix» and OccupancySensor«suffix» {
-  Connection { OfficeSpaceController«suffix».occupied <- OccupancySensor«suffix».occupied }
+ConnectionSet between OfficeSpaceController«suffix» and OccupancySensor«suffix» {
+  { OfficeSpaceController«suffix».occupied <- OccupancySensor«suffix».occupied }
 }
 '''
 
 static def officeSpaceControllerToDimmableLight(String suffix)
 '''
-Interface between OfficeSpaceController«suffix» and DimmableLight«suffix» {
-  Connection { DimmableLight«suffix».setpoint <- OfficeSpaceController«suffix».setpoint }
+ConnectionSet between OfficeSpaceController«suffix» and DimmableLight«suffix» {
+  { DimmableLight«suffix».setpoint <- OfficeSpaceController«suffix».setpoint }
 }
 '''
 
 static def corridorControllerToOccupancySensor(String suffix)
 '''
-Interface between CorridorController«suffix» and OccupancySensor«suffix» {
-  Connection { CorridorController«suffix».activity <- OccupancySensor«suffix».occupied }
+ConnectionSet between CorridorController«suffix» and OccupancySensor«suffix» {
+  { CorridorController«suffix».activity <- OccupancySensor«suffix».occupied }
 }
 '''
 
 static def corridorControllerToDimmableLight(String suffix)
 '''
-Interface between CorridorController«suffix» and DimmableLight«suffix» {
-  Connection { DimmableLight«suffix».setpoint <- CorridorController«suffix».setpoint }
+ConnectionSet between CorridorController«suffix» and DimmableLight«suffix» {
+  { DimmableLight«suffix».setpoint <- CorridorController«suffix».setpoint }
 }
 '''
 
 static def occupancySensorToActor(String suffix, boolean separateActors)
 '''
-Interface between OccupancySensor«suffix» and Actor«IF separateActors»«suffix»«ENDIF» {
-  Connection { OccupancySensor«suffix».actorXPosition <- Actor«IF separateActors»«suffix»«ENDIF».xPosition }
-  Connection { OccupancySensor«suffix».actorYPosition <- Actor«IF separateActors»«suffix»«ENDIF».yPosition }
+ConnectionSet between OccupancySensor«suffix» and Actor«IF separateActors»«suffix»«ENDIF» {
+  { OccupancySensor«suffix».actorXPosition <- Actor«IF separateActors»«suffix»«ENDIF».xPosition }
+  { OccupancySensor«suffix».actorYPosition <- Actor«IF separateActors»«suffix»«ENDIF».yPosition }
 }
 '''
 

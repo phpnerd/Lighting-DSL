@@ -22,8 +22,9 @@ static def generateLogger(int measureTime) {
 static def generateLogger(String name, int measureTime)
 '''
 FederateClass «name» {
-  SimulatorType CSV
-  DefaultMeasureTime «measureTime».0
+  Type CSV-logger {
+    DefaultMeasureTime «measureTime».0
+  }
 }
 ''' 
 }

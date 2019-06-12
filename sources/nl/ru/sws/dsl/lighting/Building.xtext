@@ -23,6 +23,7 @@ Configuration:
     (separateClasses ?= 'SeparateClasses')?
     (separateActors ?= 'SeparateActors')?
     ('ModelDir:' modelDir=STRING)?
+    (poosl ?= 'POOSL')?
 	'}'
 ;
 
@@ -41,7 +42,7 @@ Area:
 
 Room:
 	'Room' (type=RoomType)? name=ID '{'
-		('Draw:' draw = Draw)?
+		('Area:' draw = Draw)?
 		('Devices' '{'
 			devices += Device+
 		'}')?
@@ -50,7 +51,7 @@ Room:
 
 Corridor:
 	'Corridor' name=ID '{'
-		('Draw:' draw = Draw)?
+		('Area:' draw = Draw)?
 		'Rooms:' connectedRooms += [Room]+
 		('Devices' '{'
 		  devices += Device+

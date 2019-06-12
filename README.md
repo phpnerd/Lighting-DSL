@@ -81,7 +81,7 @@ Every area may either be a Room or a Corridor.
 Although the precise grammar for each of these two is a little different, both blocks contain a couple of shared attributes.
 These are the following.
 
-* **Draw: COORD+**: *Optional*. A whitespace-separates list of coordinates having the form of *(x,y)* to indicate the corners of the area.
+* **Area: COORD+**: *Optional*. A whitespace-separates list of coordinates having the form of *(x,y)* to indicate the corners of the area.
 * **Devices { DEVICE+ }**: *Optional*. A block containing all devices in the area.
 
 ##### Device
@@ -101,7 +101,7 @@ A Room is specified by the following.
 
 ```
 Room TYPE? ID {
-  DRAW?
+  AREA?
   DEVICES?
 }
 ```
@@ -116,7 +116,7 @@ A Corridor is specified by the following.
 
 ```
 Corridor ID {
-  DRAW?
+  AREA?
   Rooms: ROOM_ID+
   DEVICES?
 }

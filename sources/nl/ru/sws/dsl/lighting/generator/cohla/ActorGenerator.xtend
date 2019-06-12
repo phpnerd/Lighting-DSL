@@ -25,18 +25,18 @@ static def generateActor() {
 }
   
 static def generateActor(String name) {
-  return generateActor(name, 5.0, 0.01)
+  return generateActor(name, 5.0, 0.1)
 }
   
 static def generateActor(String name, double stepSize, double lookahead)
 '''
 FederateClass «name» {
+  Type None
   Attributes {
     Output Real xPosition
     Output Real yPosition
   }
-  SimulatorType None
-  DefaultStep Time
+  AdvanceType TimeAdvanceRequest
   DefaultStepSize «stepSize»
   DefaultLookahead «lookahead»
 }

@@ -9,9 +9,11 @@ class ORTIGenerator {
 
 static def generate()
 '''
-HlaEnvironment {
-  HlaVersion OpenRTI
-  openRTIlibRoot: "/opt/OpenRTI-libs"
+Environment {
+  RTI {
+    OpenRTI
+    Libraries "/opt/OpenRTI-libs"
+  }
   PublishOnlyChanges
 }
 '''

@@ -14,7 +14,6 @@ import nl.ru.sws.dsl.lighting.building.Configuration
 import nl.ru.sws.dsl.lighting.generator.cohla.ActorGenerator
 import nl.ru.sws.dsl.lighting.generator.cohla.CoHLAGenerator
 import nl.ru.sws.dsl.lighting.generator.cohla.DeviceGenerator
-import nl.ru.sws.dsl.lighting.generator.cohla.InterfaceGenerator
 import nl.ru.sws.dsl.lighting.generator.cohla.LoggerGenerator
 import nl.ru.sws.dsl.lighting.generator.cohla.ORTIGenerator
 import nl.ru.sws.dsl.lighting.generator.figure.SVGGenerator
@@ -23,6 +22,7 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import nl.ru.sws.dsl.lighting.generator.cohla.ConnectionSetGenerator
 
 /**
  * Generates code from your model files on save.
@@ -43,15 +43,16 @@ class BuildingGenerator extends AbstractGenerator {
 	  val separateClasses = config.separateClasses
 	  val separateActors = config.separateActors
 	  val modelDir = config.modelDir
+	  val genPoosl = config.poosl
 	  for (building : buildings) {
       val prefix = building.name.toFirstUpper + "/"
-      fsa.generateFile(prefix + building.name + ".hla", CoHLAGenerator.generate(building, building.scenarios, nrOfActors, occupancySensorRanges, hasLogger, measureTime, distributions, separateClasses, separateActors))
-      fsa.generateFile(prefix + 'Actor.hla', ActorGenerator.generate(nrOfActors, separateActors, building.areas.map[name]))
+      fsa.generateFile(prefix + building.name + ".cohla", CoHLAGenerator.generate(building, building.scenarios, nrOfActors, occupancySensorRanges, hasLogger, measureTime, distributions, separateClasses, separateActors))
+      fsa.generateFile(prefix + 'Actor.cohla', ActorGenerator.generate(nrOfActors, separateActors, building.areas.map[name]))
       if (hasLogger)
-        fsa.generateFile(prefix + 'Logger.hla', LoggerGenerator.generate(measureTime, separateClasses, building.areas.map[name]))
-      fsa.generateFile(prefix + 'FedClasses.hla', DeviceGenerator.generate(building, separateClasses, modelDir))
-      fsa.generateFile(prefix + "interfaces.hla", InterfaceGenerator.generate(building, nrOfActors, separateClasses, separateActors))
-      fsa.generateFile(prefix + 'orti.hla', ORTIGenerator.generate())
+        fsa.generateFile(prefix + 'Logger.cohla', LoggerGenerator.generate(measureTime, separateClasses, building.areas.map[name]))
+      fsa.generateFile(prefix + 'FedClasses.cohla', DeviceGenerator.generate(building, separateClasses, modelDir, genPoosl))
+      fsa.generateFile(prefix + "connectionsets.cohla", ConnectionSetGenerator.generate(building, nrOfActors, separateClasses, separateActors))
+      fsa.generateFile(prefix + 'orti.cohla', ORTIGenerator.generate())
       for (occupancySensorRange : occupancySensorRanges)
         fsa.generateFile(prefix + building.name + "_" + occupancySensorRange + ".svg", SVGGenerator.generate(building, occupancySensorRange, hideSensorRange))
       WebGenerator.generate(fsa, building, occupancySensorRanges, hideSensorRange, nrOfActors)

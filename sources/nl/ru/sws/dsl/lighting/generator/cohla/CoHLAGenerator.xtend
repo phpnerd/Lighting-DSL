@@ -32,25 +32,25 @@ static def generate(Building building, List<Scenario> scenarios, int nrOfActors,
 '''
 
 static def generateImports(Building building, boolean hasLogger, int nrOfActors, boolean separateClasses)
-'''import "orti.hla"
-import "interfaces.hla"
+'''import "orti.cohla"
+import "connectionsets.cohla"
 «IF nrOfActors> 0»
-import "Actor.hla"
+import "Actor.cohla"
 «ENDIF»«IF hasLogger»
-import "Logger.hla"
+import "Logger.cohla"
 «ENDIF»
-import "FedClasses.hla"
+import "FedClasses.cohla"
 '''
 
 static def generateBuilding(Building building, List<Scenario> scenarios, int nrOfActors, List<Integer> occupancySensorRanges, 
   boolean hasLogger, int measureTime, List<Integer> distributions, boolean separateClasses, boolean separateActors
 )
-'''Confederation «building.name» {
+'''Federation «building.name» {
   Instances {
     «generateInstances(building, separateClasses)»
     «IF hasLogger»// Logger(s)
-    «IF !separateClasses»Instance logger as Logger
-    «ELSE»«building.areas.map[a | "Instance logger" + a.name.toFirstUpper + " as Logger" + a.name.toFirstUpper].join("\n")»
+    «IF !separateClasses»logger : Logger
+    «ELSE»«building.areas.map[a | "logger" + a.name.toFirstUpper + " : Logger" + a.name.toFirstUpper].join("\n")»
     «ENDIF»
     «ENDIF»
     «generateActors(nrOfActors, separateActors, building.areas.map[name])»
@@ -60,28 +60,20 @@ static def generateBuilding(Building building, List<Scenario> scenarios, int nrO
     «generateConnections(building, nrOfActors, hasLogger, separateClasses, separateActors)»
   }
   
-  Situations {
-    «generateSituation(building)»
-    «occupancySensorRanges.map[r | generateSituation(building, r) + "\n" + generateSituationFull(building, r)].join»
-  }
+  «generateSituation(building)»
+  «occupancySensorRanges.map[r | generateSituation(building, r) + "\n" + generateSituationFull(building, r)].join»
   «IF !scenarios.empty»
   
-  Scenarios {
-    «scenarios.map[s | generate(s, measureTime, separateActors, building.areas.map[name])].join»
-  }
+  «scenarios.map[s | generate(s, measureTime, separateActors, building.areas.map[name])].join»
   «ENDIF»
   
-  DSEs {
-    DSE sensorRanges {
-      SweepMode Independent
-      Situations: «occupancySensorRanges.map[r | "base" + r].join(", ")»
-    }
+  DSE sensorRanges {
+    SweepMode Independent
+    Situations: «occupancySensorRanges.map[r | "base" + r].join(", ")»
   }
   «IF !distributions.empty»
   
-  Distributions {
-    «distributions.map[d | generateDistribution(building, d, hasLogger, nrOfActors, "dist" + d, separateClasses, separateActors)].join»
-  }
+  «distributions.map[d | generateDistribution(building, d, hasLogger, nrOfActors, "dist" + d, separateClasses, separateActors)].join»
   «ENDIF»
 }
 '''
@@ -99,18 +91,18 @@ static def generateInstance(Area area, boolean separateClasses) {
 
 static def generateInstance(Room room, boolean separateClasses)
 '''// Room «room.name»
-Instance «getInstanceName(room)» as «getInstanceClass(room, separateClasses)»
+«getInstanceName(room)» : «getInstanceClass(room, separateClasses)»
 «FOR d : room.devices»«generateInstance(d, separateClasses)»
 «ENDFOR»'''
 
 static def generateInstance(Corridor corridor, boolean separateClasses)
 '''// Corridor connecting areas «corridor.connectedRooms.map[name].join(", ")»
-Instance «getInstanceName(corridor)» as «getInstanceClass(corridor, separateClasses)»
+«getInstanceName(corridor)» : «getInstanceClass(corridor, separateClasses)»
 «FOR d : corridor.devices»«generateInstance(d, separateClasses)»
 «ENDFOR»'''
 
 static def generateInstance(Device device, boolean separateClasses)
-  '''Instance «getInstanceName(device)» as «getInstanceClass(device, separateClasses)»'''
+  '''«getInstanceName(device)» : «getInstanceClass(device, separateClasses)»'''
 
 static def generateConnections(Building building, int nrOfActors, boolean hasLogger, boolean separateClasses, boolean separateActors)
 '''«FOR room : building.areas.filter(Room)»
@@ -129,25 +121,25 @@ static def generateConnections(Building building, int nrOfActors, boolean hasLog
 «for (var i = 0; nrOfActors > 0 && i < nrOfActors; i++) {
   s += '''actor«i».xPosition, actor«i».yPosition, '''
 }»
-«IF !separateClasses»Connection { logger <- «s»«building.areas.flatMap[devices].map[generateLoggedAttributes].join(", ")» }
-«ELSE»«building.areas.map[a | "Connection { logger" + a.name.toFirstUpper + " <- " + a.devices.map[generateLoggedAttributes].join(", ") + " }"].join("\n")»
+«IF !separateClasses»{ logger <- «s»«building.areas.flatMap[devices].map[generateLoggedAttributes].join(", ")» }
+«ELSE»«building.areas.map[a | "{ logger" + a.name.toFirstUpper + " <- " + a.devices.map[generateLoggedAttributes].join(", ") + " }"].join("\n")»
 «ENDIF»
 «ENDIF»'''
 
 static def generateConnections(Room room, boolean hasLogger)
 '''
 «FOR d : room.devices»
-Connection { «getInstanceName(room)» - «getInstanceName(d)» }
+{ «getInstanceName(room)» - «getInstanceName(d)» }
 «ENDFOR»'''
 
 static def generateConnections(Corridor corridor, boolean hasLogger)
 '''«val iName = getInstanceName(corridor)»
 «FOR l : corridor.devices.filter(Light)»
-Connection { «iName» - «getInstanceName(l)» }
+{ «iName» - «getInstanceName(l)» }
 «ENDFOR»«FOR s : corridor.devices.filter(Sensor)»
-Connection { «iName» - «getInstanceName(s)» }
+{ «iName» - «getInstanceName(s)» }
 «ENDFOR»«FOR s : corridor.connectedRooms.map[devices].flatten.filter(Sensor)»
-Connection { «iName».relatedActivity <- «getInstanceName(s)».«getOutAttribute(s)» }
+{ «iName».relatedActivity <- «getInstanceName(s)».«getOutAttribute(s)» }
 «ENDFOR»'''
 
 static def generateConnections(List<Sensor> sensors, int nrOfActors, String suffix) {
@@ -155,7 +147,7 @@ static def generateConnections(List<Sensor> sensors, int nrOfActors, String suff
   for (sensor : sensors) {
     for (var i = 0; i < nrOfActors; i++)
       s += 
-'''Connection { «getInstanceName(sensor)» - actor«i»«suffix» }
+'''{ «getInstanceName(sensor)» - actor«i»«suffix» }
 '''
   }
   return s
@@ -217,10 +209,10 @@ Scenario «scenario.name» {
   «var pX = scenario.startPosition.x as double»
   «var pY = scenario.startPosition.y as double»
   «val activity = scenario.actorActivity ?: null»
-  «IF !separateClasses»On 0.0 Assign "«scenario.startPosition.x»" to actor«scenario.actorId».xPosition
-  On 0.0 Assign "«scenario.startPosition.y»" to actor«scenario.actorId».yPosition
-  «ELSE»«names.map[n | '''On 0.0 Assign "«scenario.startPosition.x»" to actor«scenario.actorId»«n.toFirstUpper».xPosition
-On 0.0 Assign "«scenario.startPosition.y»" to actor«scenario.actorId»«n.toFirstUpper».yPosition'''].join("\n")»
+  «IF !separateClasses»0.0: actor«scenario.actorId».xPosition = "«scenario.startPosition.x»"
+  0.0: actor«scenario.actorId».yPosition = "«scenario.startPosition.y»"
+«ELSE»«names.map[n | '''0.0: actor«scenario.actorId»«n.toFirstUpper».xPosition = "«scenario.startPosition.x»"
+0.0: actor«scenario.actorId»«n.toFirstUpper».yPosition = "«scenario.startPosition.y»" '''].join("\n")»
   «ENDIF»
   «FOR step : scenario.steps»
   «IF activity !== null && step.delay > activity.startFrom + activity.endBefore»
@@ -230,14 +222,14 @@ On 0.0 Assign "«scenario.startPosition.y»" to actor«scenario.actorId»«n.toF
     val startTime = subTime + activity.portion
     val endTime = Integer.min(subTime + activity.total, hardEndBound)
 s += '''
-«IF !separateClasses»On «startTime».0 Assign "-10" to actor«scenario.actorId».xPosition  // Interrupt
-On «startTime».0 Assign "-10" to actor«scenario.actorId».yPosition
-On «endTime».0 Assign "«pX»" to actor«scenario.actorId».xPosition
-On «endTime».0 Assign "«pY»" to actor«scenario.actorId».yPosition  // End interrupt
-«ELSE»«val _pX = pX»«val _pY = pY»«names.map[n | '''On «startTime».0 Assign "-10" to actor«scenario.actorId»«n.toFirstUpper».xPosition  // Interrupt
-On «startTime».0 Assign "-10" to actor«scenario.actorId»«n.toFirstUpper».yPosition
-On «endTime».0 Assign "«_pX»" to actor«scenario.actorId»«n.toFirstUpper».xPosition
-On «endTime».0 Assign "«_pY»" to actor«scenario.actorId»«n.toFirstUpper».yPosition  // End interrupt'''].join("\n")»
+«IF !separateClasses»«startTime».0: actor«scenario.actorId».xPosition = "-10"  // Interrupt
+«startTime».0: actor«scenario.actorId».yPosition = "-10"
+«endTime».0: actor«scenario.actorId».xPosition = "«pX»"
+«endTime».0: actor«scenario.actorId».yPosition = "«pY»"  // End interrupt
+«ELSE»«val _pX = pX»«val _pY = pY»«names.map[n | '''«startTime».0: actor«scenario.actorId»«n.toFirstUpper».xPosition = "-10"  // Interrupt
+«startTime».0: actor«scenario.actorId»«n.toFirstUpper».yPosition = "-10"
+«endTime».0: actor«scenario.actorId»«n.toFirstUpper».xPosition = "«_pX»"
+«endTime».0: actor«scenario.actorId»«n.toFirstUpper».yPosition = "«_pY»"  // End interrupt'''].join("\n")»
 «ENDIF»'''
   }»
   «s»
@@ -250,24 +242,24 @@ On «endTime».0 Assign "«_pY»" to actor«scenario.actorId»«n.toFirstUpper»
   «for (var subTime = time + scenario.interpolateStep, var i = 0; i < iSteps - 1 && (xStep != 0.0 || yStep != 0.0); i++, subTime += scenario.interpolateStep) {
     pX = pX + xStep
     pY = pY + yStep
-    s += '''«IF separateClasses»«FOR name : names»On «subTime».0 Assign "«new BigDecimal(pX).setScale(2, RoundingMode.HALF_UP).doubleValue()»" to actor«scenario.actorId»«name.toFirstUpper».xPosition // Interpolated
-On «subTime».0 Assign "«new BigDecimal(pY).setScale(2, RoundingMode.HALF_UP).doubleValue()»" to actor«scenario.actorId»«name.toFirstUpper».yPosition // Interpolated
-«ENDFOR»«ELSE»On «subTime».0 Assign "«new BigDecimal(pX).setScale(2, RoundingMode.HALF_UP).doubleValue()»" to actor«scenario.actorId».xPosition // Interpolated
-On «subTime».0 Assign "«new BigDecimal(pY).setScale(2, RoundingMode.HALF_UP).doubleValue()»" to actor«scenario.actorId».yPosition // Interpolated
+    s += '''«IF separateClasses»«FOR name : names»«subTime».0: actor«scenario.actorId»«name.toFirstUpper».xPosition = "«new BigDecimal(pX).setScale(2, RoundingMode.HALF_UP).doubleValue()»" // Interpolated
+«subTime».0: actor«scenario.actorId»«name.toFirstUpper».yPosition = "«new BigDecimal(pY).setScale(2, RoundingMode.HALF_UP).doubleValue()»" // Interpolated
+«ENDFOR»«ELSE»«subTime».0: actor«scenario.actorId».xPosition = "«new BigDecimal(pX).setScale(2, RoundingMode.HALF_UP).doubleValue()»" // Interpolated
+«subTime».0 actor«scenario.actorId».yPosition = "«new BigDecimal(pY).setScale(2, RoundingMode.HALF_UP).doubleValue()»" // Interpolated
 «ENDIF»'''
   }»
   «s»
   «ENDIF»
-  «IF !separateClasses»On «time += step.delay».0 Assign "«pX = step.position.x»" to actor«scenario.actorId».xPosition
-  On «time».0 Assign "«pY = step.position.y»" to actor«scenario.actorId».yPosition
-  «ELSE»«var s = ''''''»«for (var i = 0; i < names.length; i++) {
+  «IF !separateClasses»«time += step.delay».0: actor«scenario.actorId».xPosition = "«pX = step.position.x»"
+  «time».0: actor«scenario.actorId».yPosition = "«pY = step.position.y»"
+«ELSE»«var s = ''''''»«for (var i = 0; i < names.length; i++) {
     if (i == 0) {
       time += step.delay
       pX = step.position.x
       pY = step.position.y
     }
-    s += '''On «time».0 Assign "«pX»" to actor«scenario.actorId»«names.get(i).toFirstUpper».xPosition
-On «time».0 Assign "«pY»" to actor«scenario.actorId»«names.get(i).toFirstUpper».yPosition
+    s += '''«time».0: actor«scenario.actorId»«names.get(i).toFirstUpper».xPosition = "«pX»"
+«time».0: actor«scenario.actorId»«names.get(i).toFirstUpper».yPosition = "«pY»"
 '''
   }»«s»
   «ENDIF»
@@ -321,10 +313,10 @@ static def generateDistribution(Building building, int systems, boolean hasLogge
   return 
 '''
 Distribution «name» over «systems» systems {
-  «distribution.entrySet.map[e | e.value.join("System " + e.key + ": ", " ", "", [toString])].join("\n")»
+  «distribution.entrySet.map[e | e.value.join(e.key + ": ", " ", "", [toString])].join("\n")»
 }
 Distribution bad«name» over «systems» systems {
-  «badDistribution.entrySet.map[e | e.value.join("System " + e.key + ": ", " ", "", [toString])].join("\n")»
+  «badDistribution.entrySet.map[e | e.value.join(e.key + ": ", " ", "", [toString])].join("\n")»
 }
 '''
 }
@@ -339,8 +331,9 @@ static def generateLoggedAttributes(Device d) {
 static def generateLogger(int measureTime, String suffix)
 '''
 FederateClass Logger«suffix.toFirstUpper» {
-  SimulatorType CSV
-  DefaultMeasureTime «measureTime».0
+  Type CSV {
+    DefaultMeasureTime «measureTime».0
+  }
 }'''
 
 static def generateActors(int nrOfActors, boolean separateActors, List<String> names) {
@@ -351,8 +344,8 @@ static def generateActors(int nrOfActors, boolean separateActors, List<String> n
 '''
     for (var i = 0; i < nrOfActors; i++)
       s += 
-'''«IF !separateActors»Instance actor«i» as Actor
-«ELSE»«val j = i»«names.map[n | "Instance actor" + j + n.toFirstUpper + " as Actor" + n.toFirstUpper].join("\n")»
+'''«IF !separateActors»actor«i» : Actor
+«ELSE»«val j = i»«names.map[n | "actor" + j + n.toFirstUpper + " : Actor" + n.toFirstUpper].join("\n")»
 «ENDIF»'''
   }
   return s

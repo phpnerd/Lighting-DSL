@@ -109,7 +109,7 @@ Room TYPE? ID {
 Here, a type can be specified.
 There are three types: *Basic*, *Office* and *OfficeSpace*.
 By default, the type is *Basic*.
-Draw and Devices are specified as displayed above.
+Area and Devices are specified as displayed above.
 
 ##### Corridor
 A Corridor is specified by the following.

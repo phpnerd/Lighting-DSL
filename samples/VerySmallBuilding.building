@@ -1,3 +1,8 @@
+//
+// Copyright (c) Thomas Nägele and contributors. All rights reserved.
+// Licensed under the MIT license. See LICENSE file in the project root for details.
+//
+
 Configuration {
 	#Actors: 1
 	OccupancySensorRanges: 300
@@ -5,11 +10,13 @@ Configuration {
 	MeasureTime: 3600
 	HideSensorRange
 	Distributions: 2 7 14
+	ModelDir: "../../../models"
+	POOSL
 }
 
 Building VerySmallBuilding {
   Room room1 {
-    Draw: (0,0) (600,0) (600,300) (0,300)
+    Area: (0,0) (600,0) (600,300) (0,300)
     Devices {
       Light l1 on (150,150)
       Light l2 on (450,150)
@@ -17,7 +24,7 @@ Building VerySmallBuilding {
     }
   }
   Room room2 {
-    Draw: (0,450) (600,450) (600,750) (0,750)
+    Area: (0,450) (600,450) (600,750) (0,750)
     Devices {
       Light l1 on (150,600)
       Light l2 on (450,600)
@@ -25,7 +32,7 @@ Building VerySmallBuilding {
     }
   }
   Corridor corridor {
-    Draw: (0,300) (600,300) (600,450) (0,450)
+    Area: (0,300) (600,300) (600,450) (0,450)
     Rooms: room1 room2
     Devices {
       Light l1 on (150,375)

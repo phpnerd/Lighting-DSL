@@ -162,7 +162,6 @@ FederateClass «name» {
     Processes {
       c in "BasicRoomController"
     }
-    DefaultPortConfig "«modelDir»/cosim.ini"
   }
   Attributes {
     InOutput Boolean [||] occupied In Process c as "occupied"
@@ -199,7 +198,6 @@ FederateClass «name» {
     Processes {
       c in "BasicRoomController"
     }
-    DefaultPortConfig "«modelDir»/cosim.ini"
   }
   Attributes {
     InOutput Boolean [||] occupied In Process c as "occupied"
@@ -240,12 +238,12 @@ static def generateBasicRoomControllerFMU(String suffix, String modelDir, List<S
 FederateClass «name» {
   Type FMU
   Attributes {
-    InOutput Boolean [||] occupied 
+    InOutput Boolean [||] activity 
     InOutput Real setpoint
   }
   Parameters {
-    Real OccupiedHoldTime "OccupiedHoldTime"
-    Real OccupiedLevel "OccupiedLevel"
+    Real ActiveHoldTime "OccupiedHoldTime"
+    Real ActiveLevel "OccupiedLevel"
     Real VacantHoldTime "VacantHoldTime"
     Real VacantLevel "VacantLevel"
   }
@@ -269,17 +267,16 @@ static def generateBasicRoomControllerPoosl(String suffix, String modelDir, List
 FederateClass «name» {
   Type POOSL {
     Processes {
-      c in "BasicRoomController"
+      c in "controller"
     }
-    DefaultPortConfig "«modelDir»/cosim.ini"
   }
   Attributes {
-    InOutput Boolean [||] occupied in c as "occupied"
+    InOutput Boolean [||] activity in c as "activity"
     InOutput Real setpoint in c as "setpoint"
   }
   Parameters {
-    Real OccupiedHoldTime "OccupiedHoldTime" in c
-    Real OccupiedLevel "OccupiedLevel" in c
+    Real ActiveHoldTime "ActiveHoldTime" in c
+    Real ActiveLevel "ActiveLevel" in c
     Real VacantHoldTime "VacantHoldTime" in c
     Real VacantLevel "VacantLevel" in c
   }
@@ -317,8 +314,8 @@ FederateClass «name» {
     InOutput Real setpoint
   }
   Parameters {
-    Real OccupiedHoldTime "ActiveHoldTime"
-    Real OccupiedLevel "ActiveLevel"
+    Real ActiveHoldTime "ActiveHoldTime"
+    Real ActiveLevel "ActiveLevel"
     Real VacantHoldTime "VacantHoldTime"
     Real VacantLevel "VacantLevel"
     Real RelatedHoldTime "RelatedHoldTime"
@@ -344,9 +341,8 @@ static def generateCorridorControllerPoosl(String suffix, String modelDir, List<
 FederateClass «name» {
   Type POOSL {
     Processes {
-      c in "CorridorController"
+      c in "controller"
     }
-    DefaultPortConfig "«modelDir»/cosim.ini"
   }
   Attributes {
     InOutput Boolean [||] activity in c as "activity"
@@ -354,8 +350,8 @@ FederateClass «name» {
     InOutput Real setpoint in c as "setpoint"
   }
   Parameters {
-    Real OccupiedHoldTime "ActiveHoldTime" in c
-    Real OccupiedLevel "ActiveLevel" in c
+    Real ActiveHoldTime "ActiveHoldTime" in c
+    Real ActiveLevel "ActiveLevel" in c
     Real VacantHoldTime "VacantHoldTime" in c
     Real VacantLevel "VacantLevel" in c
     Real RelatedHoldTime "RelatedHoldTime" in c

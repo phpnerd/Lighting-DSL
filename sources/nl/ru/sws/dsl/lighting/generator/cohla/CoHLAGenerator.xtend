@@ -245,7 +245,7 @@ s += '''
     s += '''«IF separateClasses»«FOR name : names»«subTime».0: actor«scenario.actorId»«name.toFirstUpper».xPosition = "«new BigDecimal(pX).setScale(2, RoundingMode.HALF_UP).doubleValue()»" // Interpolated
 «subTime».0: actor«scenario.actorId»«name.toFirstUpper».yPosition = "«new BigDecimal(pY).setScale(2, RoundingMode.HALF_UP).doubleValue()»" // Interpolated
 «ENDFOR»«ELSE»«subTime».0: actor«scenario.actorId».xPosition = "«new BigDecimal(pX).setScale(2, RoundingMode.HALF_UP).doubleValue()»" // Interpolated
-«subTime».0 actor«scenario.actorId».yPosition = "«new BigDecimal(pY).setScale(2, RoundingMode.HALF_UP).doubleValue()»" // Interpolated
+«subTime».0: actor«scenario.actorId».yPosition = "«new BigDecimal(pY).setScale(2, RoundingMode.HALF_UP).doubleValue()»" // Interpolated
 «ENDIF»'''
   }»
   «s»

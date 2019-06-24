@@ -88,7 +88,7 @@ static def generateInterfaces(Area area, int nrOfActors, boolean separateActors)
 static def basicRoomControllerToOccupancySensor(String suffix)
 '''
 ConnectionSet between BasicRoomController«suffix» and OccupancySensor«suffix» {
-  { BasicRoomController«suffix».occupied <- OccupancySensor«suffix».occupied }
+  { BasicRoomController«suffix».activity <- OccupancySensor«suffix».occupied }
 }
 '''
 
@@ -102,7 +102,7 @@ ConnectionSet between BasicRoomController«suffix» and DimmableLight«suffix» 
 static def officeControllerToOccupancySensor(String suffix)
 '''
 ConnectionSet between OfficeController«suffix» and OccupancySensor«suffix» {
-  { OfficeController«suffix».occupied <- OccupancySensor«suffix».occupied }
+  { OfficeController«suffix».activity <- OccupancySensor«suffix».occupied }
 }
 '''
 
@@ -116,7 +116,7 @@ ConnectionSet between OfficeController«suffix» and DimmableLight«suffix» {
 static def officeSpaceControllerToOccupancySensor(String suffix)
 '''
 ConnectionSet between OfficeSpaceController«suffix» and OccupancySensor«suffix» {
-  { OfficeSpaceController«suffix».occupied <- OccupancySensor«suffix».occupied }
+  { OfficeSpaceController«suffix».activity <- OccupancySensor«suffix».occupied }
 }
 '''
 

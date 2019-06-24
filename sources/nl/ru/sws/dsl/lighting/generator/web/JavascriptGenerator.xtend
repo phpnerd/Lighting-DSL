@@ -32,10 +32,10 @@ function isAPIAvailable() {
 
 function attachHandlers() {
   lights = $("circle").filter(function() { 
-      return this.id.match(/(r|c)(\d+)_l(\d+)/);
+      return this.id.match(/(r(oom|)|c(orridor|))(\d*)_l(\d+)/);
     });
   sensors = $("circle").filter(function() { 
-      return this.id.match(/(r|c)(\d+)_s(\d+)/);
+      return this.id.match(/(r(oom|)|c(orridor|))(\d*)_s(\d+)/);
     });
   actors = $("circle").filter(function() { 
       return this.id.match(/actor(\d+)/);
@@ -189,7 +189,7 @@ function setState(state) {
   sensors.each(function(i, s) {
     var _id = s.id.capitalize();
     var occupied = state[_id + "Occupied"];
-    if (occupied) setSensorState(s, occupied == "true");
+    if (occupied) setSensorState(s, occupied == 1 || occupied == "true");
   });
   lights.each(function(i, l) {
     var _id = l.id.capitalize();
